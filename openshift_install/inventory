@@ -1,0 +1,27 @@
+[masters]
+master.lab.example.com
+
+[nfs]
+master.lab.example.com
+
+[etcd]
+master.lab.example.com
+
+[nodes]
+master.lab.example.com openshift_node_group_name='node-config-master-infra'
+node1.lab.example.com openshift_schedulable=true openshift_node_group_name='node-config-compute'
+node2.lab.example.com openshift_schedulable=true openshift_node_group_name='node-config-compute'
+
+[OSEv3:children]
+masters
+etcd
+nodes
+nfs
+
+[nodes:vars]
+openshift_deployment_type=origin
+os_firewall_use_firewalld=true
+openshift_master_identity_providers=[{'name': 'htpasswd_auth', 'login': 'true', 'challenge': 'true', 'kind': 'HTPasswdPasswordIdentityProvider'}]
+openshift_pkg_version='-3.11.0'
+openshift_master_default_subdomain=apps.lab.example.com
+openshift_disable_check=disk_availability,memory_availability
