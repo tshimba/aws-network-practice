@@ -1,0 +1,30 @@
+{
+  "Version": "2012-10-17",
+  "Statement": [
+      {
+          "Sid": "VisualEditor0",
+          "Effect": "Allow",
+          "Action": [
+              "cloudformation:CreateUploadBucket",
+              "cloudformation:EstimateTemplateCost",
+              "cloudformation:DescribeStackDriftDetectionStatus",
+              "cloudformation:ListExports",
+              "cloudformation:ListStacks",
+              "cloudformation:ListImports",
+              "cloudformation:DescribeAccountLimits",
+              "cloudformation:ValidateTemplate",
+              "cloudformation:GetTemplateSummary"
+          ],
+          "Resource": "*"
+      },
+      {
+          "Sid": "VisualEditor1",
+          "Effect": "Allow",
+          "Action": "cloudformation:*",
+          "Resource": [
+              "arn:aws:cloudformation:*:*:stack/*/*",
+              "arn:aws:cloudformation:*:*:stackset/*:*"
+          ]
+      }
+  ]
+}

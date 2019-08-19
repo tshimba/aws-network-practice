@@ -1,0 +1,74 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Resources:
+  OpenShiftVpc:
+    Type: AWS::EC2::VPC
+    Properties:
+      CidrBlock: 10.0.0.0/16
+      EnableDnsSupport: "true"
+      EnableDnsHostnames: "true"
+      InstanceTenancy: default
+      Tags:
+        - Key: Name
+          Value: openshift-vpc
+  DhcpOptionSet:
+    Type: AWS::EC2::DHCPOptions
+    Properties:
+      DomainName: lab.example.com
+      DomainNameServers:
+        - AmazonProvidedDNS
+      Tags:
+        - Key: Name
+          Value: openshift-vpc-dhcp-option-set
+  VpcDhcpAssociation:
+    Type: AWS::EC2::VPCDHCPOptionsAssociation
+    Properties:
+      VpcId:
+        Ref: OpenShiftVpc
+      DhcpOptionsId:
+        Ref: DhcpOptionSet
+  PublicSubnetA:
+    DependsOn: OpenShiftVpc
+    Type: AWS::EC2::Subnet
+    Properties:
+      VpcId: !Ref OpenShiftVpc
+      CidrBlock: 10.0.0.0/24
+      AvailabilityZone: "ap-southeast-1a"
+# https://qiita.com/okubot55/items/b18a5dd5166f1ec2696c
+# ------------------------------------------------------------#
+# InternetGateway
+# ------------------------------------------------------------#
+  InternetGateway: 
+    Type: "AWS::EC2::InternetGateway"
+  InternetGatewayAttachment: 
+    Type: "AWS::EC2::VPCGatewayAttachment"
+    Properties: 
+      InternetGatewayId: !Ref InternetGateway
+      VpcId: !Ref OpenShiftVpc 
+# ------------------------------------------------------------#
+#  RouteTable
+# ------------------------------------------------------------#
+  PublicRouteTableA:
+    Type: "AWS::EC2::RouteTable"
+    Properties:
+      VpcId: !Ref OpenShiftVpc
+# ------------------------------------------------------------#
+# Routing
+# ------------------------------------------------------------#
+  PublicRouteA: 
+    Type: "AWS::EC2::Route"
+    Properties: 
+      RouteTableId: !Ref PublicRouteTableA 
+      DestinationCidrBlock: "0.0.0.0/0"
+      GatewayId: !Ref InternetGateway 
+# ------------------------------------------------------------#
+# RouteTable Associate
+# ------------------------------------------------------------# 
+  PublicSubnetARouteTableAssociation: 
+    Type: "AWS::EC2::SubnetRouteTableAssociation"
+    Properties: 
+      SubnetId: !Ref PublicSubnetA 
+      RouteTableId: !Ref PublicRouteTableA
+Outputs:
+  VpcId:
+    Description: Created VPC ID
+    Value: !Ref OpenShiftVpc

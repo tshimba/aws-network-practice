@@ -1,0 +1,69 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Parameters:
+  HostedZoneName:
+    Type: String  # example2.com.
+  OpenShiftVpcId:
+    Type: String  # vpc-09714cf97760a496f
+  OpenShiftVpcRegion:
+    Type: String  # ap-southeast-1
+Resources:
+  Route53HostedZone:
+    Type: AWS::Route53::HostedZone
+    Properties: 
+      HostedZoneConfig: 
+        Comment: "Private hosted zone for OpenShift VPC"
+      Name: !Sub ${HostedZoneName}
+      VPCs:
+        - 
+          VPCId: !Sub ${OpenShiftVpcId}
+          VPCRegion: !Sub ${OpenShiftVpcRegion}
+  MainRecordSet:
+    DependsOn: Route53HostedZone
+    Type: "AWS::Route53::RecordSet"
+    Properties:
+      HostedZoneName: !Sub ${HostedZoneName}
+      Name: !Sub main.lab.${HostedZoneName}
+      Type: A
+      ResourceRecords:
+        - "10.0.0.43"
+      TTL: "60"
+  Node1RecordSet:
+    DependsOn: Route53HostedZone
+    Type: "AWS::Route53::RecordSet"
+    Properties:
+      HostedZoneName: !Sub ${HostedZoneName}
+      Name: !Sub node1.lab.${HostedZoneName}
+      Type: A
+      ResourceRecords:
+        - "10.0.0.43"
+      TTL: "60"
+  Node2RecordSet:
+    DependsOn: Route53HostedZone
+    Type: "AWS::Route53::RecordSet"
+    Properties:
+      HostedZoneName: !Sub ${HostedZoneName}
+      Name: !Sub node2.lab.${HostedZoneName}
+      Type: A
+      ResourceRecords:
+        - "10.0.0.43"
+      TTL: "60"
+  WorkstationRecordSet:
+    DependsOn: Route53HostedZone
+    Type: "AWS::Route53::RecordSet"
+    Properties:
+      HostedZoneName: !Sub ${HostedZoneName}
+      Name: !Sub workstation.lab.${HostedZoneName}
+      Type: A
+      ResourceRecords:
+        - "10.0.0.43"
+      TTL: "60"
+  AppRecordSet:
+    DependsOn: Route53HostedZone
+    Type: "AWS::Route53::RecordSet"
+    Properties:
+      HostedZoneName: !Sub ${HostedZoneName}
+      Name: !Sub \*.apps.lab.${HostedZoneName}
+      Type: A
+      ResourceRecords:
+        - "10.0.0.43"
+      TTL: "60"
